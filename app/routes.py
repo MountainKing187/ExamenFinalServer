@@ -121,9 +121,10 @@ def get_ia_analisis():
         agente = GeminiAgent()
 
         analisis = jsonify({
-            "analisis": agente.analizar_datos_gemini(formatted_readings),
+            "analisis": agente.analizar_datos_gemini(str(formatted_readings)),
             "current_time": current_time
         })
+
         ia_collection.insert_one(analisis)
         
         return analisis , 201
