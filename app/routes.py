@@ -92,7 +92,7 @@ def get_latest_sensor_readings():
         logger.error(f"Error al obtener lecturas: {str(e)}", exc_info=True)
         return jsonify({"error": "Error interno del servidor"}), 500
 
-@main_bp.route('/api/sensor/veria', methods=['GET'])
+@main_bp.route('/api/veria', methods=['GET'])
 def get_ia_analisis():
     sensor_collection = mongo.get_collection('sensor_readings')
     ia_collection = mongo.get_collection('ia_analisis')
@@ -119,7 +119,7 @@ def get_ia_analisis():
             formatted_readings.append(formatted)
 
         analisis = jsonify({
-            "analisis": gemini_agent.analizar_datos_gemini(formatted_readings),
+            "analisis": GeminiAgent.analizar_datos_gemini(formatted_readings),
             "current_time": current_time
         })
         ia_collection.insert_one(analisis)
