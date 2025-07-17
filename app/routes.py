@@ -4,12 +4,9 @@ import json
 from bson import json_util
 from datetime import datetime, timedelta
 from pymongo import DESCENDING
-import logging
 
 
 main_bp = Blueprint('main', __name__)
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 @main_bp.route('/')
 def dashboard():
@@ -20,18 +17,9 @@ def dashboard():
 def handle_json():
     collection = mongo.get_collection('sensor_readings')
 
-    # Debugging: Log incoming request details
-    logger.debug(f"Received {request.method} request to {request.path}")
-    logger.debug(f"Headers: {dict(request.headers)}")
-    logger.debug(f"Remote IP: {request.remote_addr}")
-
     # Verificar que el contenido sea JSON
     if not request.is_json:
         return jsonify({"error": "Content-Type debe ser application/json"}), 400
-
-    if not request.is_json:
-        logger.warning("Rejected: Invalid content type")
-        return jsonify({"error": "Content-Type must be application/json"}), 400
     
     try:
         # Obtener los datos JSON del request
