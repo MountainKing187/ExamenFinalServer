@@ -1,13 +1,12 @@
 from flask import Blueprint, render_template, jsonify, request, current_app
 from app import mongo
-from app import gemini_agent
+from app.gemini_agent import GeminiAgent 
 import json
 from bson import json_util
 import time
 from datetime import datetime, timedelta
 from pymongo import DESCENDING
 import logging
-import google.generativeai as genai
 
 main_bp = Blueprint('main', __name__)
 
