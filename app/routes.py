@@ -119,8 +119,10 @@ def get_ia_analisis():
             formatted_readings.append(formatted)
 
         agente = GeminiAgent()
-        
-        return agente.analizar_datos_gemini(str(formatted_readings)) , 201
+        analisis = agente.analizar_datos_gemini(str(formatted_readings))
+        sleep(60)
+        print(analisis)
+        return analisis , 201
         
     except Exception as e:
         logger.error(f"Error obteniendo datos: {str(e)}", exc_info=True)
