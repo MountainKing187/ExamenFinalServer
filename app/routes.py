@@ -13,7 +13,7 @@ def dashboard():
     return render_template('dashboard.html')
 
 
-@app.route('/api/sensor', methods=['POST'])
+@main_bp.route('/api/sensor', methods=['POST'])
 def handle_json():
     collection = mongo.get_collection('sensor_readings')
 
@@ -42,7 +42,7 @@ def handle_json():
         # Manejar cualquier error inesperado
         return jsonify({"error": f"Error al procesar la solicitud: {str(e)}"}), 500
 
-@app.route('/api/sensor/latest', methods=['GET'])
+@main_bp.route('/api/sensor/latest', methods=['GET'])
 def get_latest_sensor_readings():
     try:
         # Obtener el parámetro 'n' de la query string, con valor por defecto 1 si no se especifica
