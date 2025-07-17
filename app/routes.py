@@ -46,29 +46,40 @@ def handle_json():
 def get_latest_sensor_readings():
     collection = mongo.get_collection('sensor_readings')
     try:
-        # Obtener el parámetro 'n' de la query string, con valor por defecto 1 si no se especifica
-        n = int(request.args.get('n', default=1))
+        # Obtener el parámetro 'n' con valor por defecto 1
+        n = int(request.args.get('n', 1))
         
-        # Validar que n sea un número positivo
-        if n <= 0:
-            return jsonify({"error": "El parámetro 'n' debe ser un número positivo"}), 400
+        # Validar que n sea un número positivo con límite máximo
+        if n <= 0 or n > 1000:
+            return jsonify({"error": "El parámetro 'n' debe estar entre 1 y 1000"}), 400
         
-        # Obtener las últimas N lecturas ordenadas por _id descendente (asumiendo que _id es ObjectId con timestamp)
-        # Asumo que los datos del sensor están en una colección llamada 'sensor_readings'
+        # Obtener las últimas N lecturas ordenadas por Timestamp descendente
         readings = list(collection.find()
-                       .sort([('_id', -1)])
+                       .sort([('Timestamp', pymongo.DESCENDING)])
                        .limit(n))
         
-        # Convertir ObjectId a string para que sea JSON serializable
+        # Transformar los documentos para usar Timestamp como id
+        formatted_readings = []
         for reading in readings:
-            reading['_id'] = str(reading['_id'])
+            # Crear nuevo documento con el formato requerido
+            formatted = {
+                "id": reading["Timestamp"],
+                "x": reading["x"],
+                "y": reading["y"],
+                "z": reading["z"]
+            }
+            formatted_readings.append(formatted)
         
         return jsonify({
-            "count": len(readings),
-            "readings": readings
+            "count": len(formatted_readings),
+            "readings": formatted_readings
         }), 200
         
+    except KeyError as e:
+        logger.error(f"Campo faltante en documento: {str(e)}")
+        return jsonify({"error": f"Campo requerido faltante: {str(e)}"}), 500
     except ValueError:
         return jsonify({"error": "El parámetro 'n' debe ser un número entero válido"}), 400
     except Exception as e:
-        return jsonify({"error": f"Error al obtener las lecturas: {str(e)}"}), 500
+        logger.error(f"Error al obtener lecturas: {str(e)}", exc_info=True)
+        return jsonify({"error": "Error interno del servidor"}), 500
