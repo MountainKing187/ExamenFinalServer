@@ -76,10 +76,10 @@ def get_latest_sensor_readings():
         }), 200
         
     except KeyError as e:
-        logger.error(f"Campo faltante en documento: {str(e)}")
+        print(f"Campo faltante en documento: {str(e)}")
         return jsonify({"error": f"Campo requerido faltante: {str(e)}"}), 500
     except ValueError:
         return jsonify({"error": "El parámetro 'n' debe ser un número entero válido"}), 400
     except Exception as e:
-        logger.error(f"Error al obtener lecturas: {str(e)}", exc_info=True)
+        print(f"Error al obtener lecturas: {str(e)}", exc_info=True)
         return jsonify({"error": "Error interno del servidor"}), 500
