@@ -4,11 +4,13 @@ import json
 from bson import json_util
 from datetime import datetime, timedelta
 from pymongo import DESCENDING
-import logger
 import pymongo
-
+import logging
 
 main_bp = Blueprint('main', __name__)
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 @main_bp.route('/')
 def dashboard():
