@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crypto Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head> 
+<body> 
+    <div class="container"> 
+        <h1>Crypto Dashboard</h1> 
+         
+        <!-- Selector de moneda --> 
+        <div class="currency-selector"> 
+            <button class="currency-btn active" data-currency="ethereum">Ethereum</button> 
+            <button class="currency-btn" data-currency="dogecoin">Dogecoin</button> 
+            <button class="currency-btn" data-currency="bitcoin">Bitcoin</button> 
+        </div> 
+        <!-- Selector de hora --> 
+        <div class="time-range-selector"> 
+                <button class="time-btn active" data-hours="24">24h</button> 
+                <button class="time-btn" data-hours="12">12h</button> 
+                <button class="time-btn" data-hours="6">6h</button> 
+        </div> 
+        <!-- Contenedor del gráfico --> 
+        <div class="chart-container"> 
+            <canvas id="cryptoChart"></canvas> 
+        </div> 
+         
+        <!-- Sección de bloques y transacciones --> 
+        <div class="grid-container"> 
+            <div class="recent-blocks"> 
+                <h2>Últimos Bloques</h2> 
+                <ul id="blocks-list"></ul> 
+            </div> 
+             
+            <div class="block-transactions"> 
+                <h2>Transacciones del Bloque</h2> 
+                <div id="transactions-container"></div> 
+            </div> 
+        </div> 
+         
+    </div> 
+     
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script> 
+</body> 
+</html>
