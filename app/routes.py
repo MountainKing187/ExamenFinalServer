@@ -55,7 +55,7 @@ def get_latest_sensor_readings():
         
         # Obtener las últimas N lecturas ordenadas por _id descendente (asumiendo que _id es ObjectId con timestamp)
         # Asumo que los datos del sensor están en una colección llamada 'sensor_readings'
-        readings = list(db.collection.find()
+        readings = list(collection.find()
                        .sort([('_id', -1)])
                        .limit(n))
         
