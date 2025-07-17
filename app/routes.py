@@ -1,11 +1,13 @@
 from flask import Blueprint, render_template, jsonify, request, current_app
 from app import mongo
+from app import gemini_agent
 import json
 from bson import json_util
+import time
 from datetime import datetime, timedelta
 from pymongo import DESCENDING
-import pymongo
 import logging
+import google.generativeai as genai
 
 main_bp = Blueprint('main', __name__)
 
@@ -32,6 +34,9 @@ def handle_json():
         # Validar que el JSON no esté vacío
         if not data:
             return jsonify({"error": "El cuerpo de la solicitud no puede estar vacío"}), 400
+
+        logger.debug(f"Received JSON data: {data}")
+        
         
         # Insertar el documento en MongoDB (asumo una colección llamada 'coleccion')
         result = collection.insert_one(data)
@@ -59,7 +64,7 @@ def get_latest_sensor_readings():
         
         # Obtener las últimas N lecturas ordenadas por Timestamp descendente
         readings = list(collection.find()
-                       .sort([('Timestamp', pymongo.DESCENDING)])
+                       .sort([('Timestamp', DESCENDING)])
                        .limit(n))
         
         # Transformar los documentos para usar Timestamp como id
@@ -86,4 +91,42 @@ def get_latest_sensor_readings():
         return jsonify({"error": "El parámetro 'n' debe ser un número entero válido"}), 400
     except Exception as e:
         logger.error(f"Error al obtener lecturas: {str(e)}", exc_info=True)
+        return jsonify({"error": "Error interno del servidor"}), 500
+
+@main_bp.route('/api/sensor/veria', methods=['GET'])
+def get_ia_analisis():
+    sensor_collection = mongo.get_collection('sensor_readings')
+    ia_collection = mongo.get_collection('ia_analisis')
+    try:
+        # Calcular el timestamp de hace 1 minuto (en milisegundos)
+        current_time = datetime.utcnow()
+        one_minute_ago = current_time - timedelta(minutes=1)
+        timestamp_threshold = int(one_minute_ago.timestamp() * 1000)  # Convertir a ms
+        
+        # Consultar documentos con Timestamp >= timestamp_threshold
+        query = {"Timestamp": {"$gte": timestamp_threshold}}
+        readings = list(sensor_collection.find(query)
+        
+        # Formatear la respuesta
+        formatted_readings = []
+
+        for reading in readings:
+            formatted = {
+                "timestamp": reading["Timestamp"],
+                "x": reading["x"],
+                "y": reading["y"],
+                "z": reading["z"]
+            }
+            formatted_readings.append(formatted)
+
+        analisis = jsonify({
+            "analisis": gemini_agent.analizar_datos_gemini(formatted_readings),
+            "current_time": current_time
+        })
+        ia_collection.insert_one(analisis)
+        
+        return analisis , 201
+        
+    except Exception as e:
+        logger.error(f"Error obteniendo datos: {str(e)}", exc_info=True)
         return jsonify({"error": "Error interno del servidor"}), 500
