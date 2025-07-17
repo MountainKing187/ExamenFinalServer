@@ -118,8 +118,10 @@ def get_ia_analisis():
             }
             formatted_readings.append(formatted)
 
+        agente = GeminiAgent
+
         analisis = jsonify({
-            "analisis": GeminiAgent.analizar_datos_gemini(formatted_readings),
+            "analisis": agente.analizar_datos_gemini(formatted_readings),
             "current_time": current_time
         })
         ia_collection.insert_one(analisis)
