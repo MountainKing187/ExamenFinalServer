@@ -4,9 +4,12 @@ import json
 from bson import json_util
 from datetime import datetime, timedelta
 from pymongo import DESCENDING
+import logging
 
 
 main_bp = Blueprint('main', __name__)
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 @main_bp.route('/')
 def dashboard():
@@ -16,6 +19,11 @@ def dashboard():
 @main_bp.route('/api/sensor', methods=['POST'])
 def handle_json():
     collection = mongo.get_collection('sensor_readings')
+
+    # Debugging: Log incoming request details
+    logger.debug(f"Received {request.method} request to {request.path}")
+    logger.debug(f"Headers: {dict(request.headers)}")
+    logger.debug(f"Remote IP: {request.remote_addr}")
 
     # Verificar que el contenido sea JSON
     if not request.is_json:
@@ -44,6 +52,7 @@ def handle_json():
 
 @main_bp.route('/api/sensor/latest', methods=['GET'])
 def get_latest_sensor_readings():
+    collection = mongo.get_collection('sensor_readings')
     try:
         # Obtener el parámetro 'n' de la query string, con valor por defecto 1 si no se especifica
         n = int(request.args.get('n', default=1))
@@ -54,7 +63,7 @@ def get_latest_sensor_readings():
         
         # Obtener las últimas N lecturas ordenadas por _id descendente (asumiendo que _id es ObjectId con timestamp)
         # Asumo que los datos del sensor están en una colección llamada 'sensor_readings'
-        readings = list(db.sensor_readings.find()
+        readings = list(db.collection.find()
                        .sort([('_id', -1)])
                        .limit(n))
         
