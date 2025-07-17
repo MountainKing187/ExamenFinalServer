@@ -1,4 +1,5 @@
 import os
+from app.utils import config_loader
 import google.generativeai as genai
 
 class GeminiAgent:
