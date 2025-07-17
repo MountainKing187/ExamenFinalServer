@@ -118,7 +118,7 @@ def get_ia_analisis():
             }
             formatted_readings.append(formatted)
 
-        agente = GeminiAgent
+        agente = GeminiAgent()
 
         analisis = jsonify({
             "analisis": agente.analizar_datos_gemini(formatted_readings),
