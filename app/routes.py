@@ -119,15 +119,8 @@ def get_ia_analisis():
             formatted_readings.append(formatted)
 
         agente = GeminiAgent()
-
-        analisis = jsonify({
-            "analisis": agente.analizar_datos_gemini(str(formatted_readings)),
-            "current_time": current_time
-        })
-
-        ia_collection.insert_one(analisis)
         
-        return analisis , 201
+        return agente.analizar_datos_gemini(str(formatted_readings)) , 201
         
     except Exception as e:
         logger.error(f"Error obteniendo datos: {str(e)}", exc_info=True)
