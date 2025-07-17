@@ -120,7 +120,7 @@ def get_ia_analisis():
 
         agente = GeminiAgent()
         analisis = agente.analizar_datos_gemini(str(formatted_readings))
-        sleep(60)
+        time.sleep(60)
         print(analisis)
         return analisis , 201
         
