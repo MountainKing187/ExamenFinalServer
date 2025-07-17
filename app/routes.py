@@ -28,6 +28,10 @@ def handle_json():
     # Verificar que el contenido sea JSON
     if not request.is_json:
         return jsonify({"error": "Content-Type debe ser application/json"}), 400
+
+    if not request.is_json:
+        logger.warning("Rejected: Invalid content type")
+        return jsonify({"error": "Content-Type must be application/json"}), 400
     
     try:
         # Obtener los datos JSON del request
