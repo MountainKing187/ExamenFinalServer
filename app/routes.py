@@ -4,7 +4,8 @@ import json
 from bson import json_util
 from datetime import datetime, timedelta
 from pymongo import DESCENDING
-import logger, pymongo
+import logger
+import pymongo
 
 
 main_bp = Blueprint('main', __name__)
