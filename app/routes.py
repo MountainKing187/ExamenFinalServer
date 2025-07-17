@@ -105,7 +105,7 @@ def get_ia_analisis():
         
         # Consultar documentos con Timestamp >= timestamp_threshold
         query = {"Timestamp": {"$gte": timestamp_threshold}}
-        readings = list(sensor_collection.find(query)
+        readings = list(sensor_collection.find(query))
         
         # Formatear la respuesta
         formatted_readings = []
