@@ -56,7 +56,7 @@ class GeminiAgent:
                 "analisis_gemini": analisis
             }
                 
-            self.aiprompt.insert_one(documento_analisis)
+            self.ia_analisis.insert_one(documento_analisis)
 
         except Exception as e:
             print(f"Error: {e}")
