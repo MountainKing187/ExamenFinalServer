@@ -33,9 +33,12 @@ def handle_json():
             return jsonify({"error": "El cuerpo de la solicitud no puede estar vacío"}), 400
 
         print(f"Received JSON data: {data}")
+
+        data['source'] = 'HTTP'
         
         # Insertar el documento en MongoDB
         result = collection.insert_one(data)
+        print(str(result.inserted_id))
         
         # Retornar respuesta con el ID del documento insertado
         return jsonify({
@@ -94,7 +97,7 @@ def get_ia_analisis():
     collection = mongo.get_collection('sensor_readings')
 
     # Obtener el tiempo actual y el de hace 1 minuto
-    ahora = datetime.utcnow()
+    ahora = datetime.utcnow() - timedelta(hours=4)
     hace_un_minuto = ahora - timedelta(minutes=1)
     
     # Convertir a timestamp en milisegundos
