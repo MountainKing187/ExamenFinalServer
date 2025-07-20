@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, jsonify, request, current_app
 from app import mongo
-from app.gemini_agent import GeminiAgent 
 import json
 from bson import json_util
 import time
@@ -94,36 +93,6 @@ def get_latest_sensor_readings():
 
 @main_bp.route('/api/veria', methods=['GET'])
 def get_ia_analisis():
-    sensor_collection = mongo.get_collection('sensor_readings')
-    ia_collection = mongo.get_collection('ia_analisis')
-    try:
-        # Calcular el timestamp de hace 1 minuto (en milisegundos)
-        current_time = datetime.utcnow()
-        one_minute_ago = current_time - timedelta(minutes=1)
-        timestamp_threshold = int(one_minute_ago.timestamp() * 1000)  # Convertir a ms
-        
-        # Consultar documentos con Timestamp >= timestamp_threshold
-        query = {"Timestamp": {"$gte": timestamp_threshold}}
-        readings = list(sensor_collection.find(query))
-        
-        # Formatear la respuesta
-        formatted_readings = []
-
-        for reading in readings:
-            formatted = {
-                "timestamp": reading["Timestamp"],
-                "x": reading["x"],
-                "y": reading["y"],
-                "z": reading["z"]
-            }
-            formatted_readings.append(formatted)
-
-        agente = GeminiAgent()
-        analisis = agente.analizar_datos_gemini(str(formatted_readings))
-        time.sleep(60)
-        print(analisis)
-        return analisis , 201
-        
-    except Exception as e:
-        logger.error(f"Error obteniendo datos: {str(e)}", exc_info=True)
-        return jsonify({"error": "Error interno del servidor"}), 500
+    collection = mongo.get_collection('ia_analisis')
+    data = collection.find_one(sort=[('fecha_analisis', DESCENDING)])
+    return json.loads(json_util.dumps(data))
