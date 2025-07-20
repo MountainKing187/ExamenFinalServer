@@ -8,11 +8,11 @@ def main():
     # Iniciar servidores
     tcp_server = TCPServer(port=6000)
     udp_server = UDPServer(port=7000)
-    gemini_agent = GeminiAgent()
+    # gemini_agent = GeminiAgent()
 
     tcp_server.start()
     udp_server.start()
-    gemini_agent.start()
+    # gemini_agent.start()
 
     try:
         # Mantener el programa principal en ejecución
@@ -22,7 +22,7 @@ def main():
         print("Deteniendo servicios...")
         tcp_server.stop()
         udp_server.stop()
-        gemini_agent.stop()
+        # gemini_agent.stop()
         print("Servicios detenidos.")
 
 

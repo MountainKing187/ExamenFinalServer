@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, jsonify, request, current_app
 from app import mongo
+from app.utils import config_loader
 import json
 from bson import json_util
 import time
@@ -92,6 +93,45 @@ def get_latest_sensor_readings():
 
 @main_bp.route('/api/veria', methods=['GET'])
 def get_ia_analisis():
-    collection = mongo.get_collection('ia_analisis')
-    data = collection.find_one(sort=[('fecha_analisis', DESCENDING)])
-    return json.loads(json_util.dumps(data))
+    hora_actual = datetime.utcnow()
+    hace_un_minuto = hora_actual - timedelta(minutes=1)
+    
+    # Consultar registros recientes
+    query = {"timestamp": {"$gte": hace_un_minuto}}
+    registros = list(self.sensor_readings.find(query))
+
+    analisis = perform_analysis(registros)
+    
+    return analisis
+
+def perform_analysis(registros):
+    config = config_loader.load_config()
+
+    genai.configure(api_key=config.GEMINI_API_KEY)
+    model = genai.GenerativeModel('gemini-2.5-flash')
+
+    try:
+        """Realiza el análisis de datos con Gemini"""
+
+        # Si no hay datos nuevos, saltar el análisis
+        if not registros:
+            print("No hay nuevos datos para analizar")
+            return
+
+        prompt = f"""
+        Analiza estos datos de un sensor acelerómetro y detecta posibles anomalías.
+
+        Datos en formato JSON (Tiempo: Unix Timestamp en milisegundos, x=float, y=float, z=float):
+        {registros}
+        """
+      
+        response = model.generate_content(prompt)
+        analisis = response.text.strip()
+        
+        return analisis
+
+    except Exception as e:
+        print(f"Error en el análisis: {e}")
+        time.sleep(10)
+
+    return

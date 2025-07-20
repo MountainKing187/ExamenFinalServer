@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import time
-from app.utils import config_loader, mongo_handler
+from app.utils import config_loader
+from app import mongo
 import os
 import google.generativeai as genai
 import threading
