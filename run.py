@@ -5,12 +5,13 @@ import threading
 app = create_app()
 
 def main():
-    # Iniciar el servidor TCP
+    # Iniciar servidores
     tcp_server = TCPServer(port=6000)
-    tcp_server.start()
-
-    # Iniciar el agente Gemini
+    udp_server = UDPServer(port=7000)
     gemini_agent = GeminiAgent()
+
+    tcp_server.start()
+    udp_server.start()
     gemini_agent.start()
 
     try:
@@ -20,8 +21,10 @@ def main():
     except KeyboardInterrupt:
         print("Deteniendo servicios...")
         tcp_server.stop()
+        udp_server.stop()
         gemini_agent.stop()
         print("Servicios detenidos.")
+
 
 if __name__ == '__main__':
     print("asasd")

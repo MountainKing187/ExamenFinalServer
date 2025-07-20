@@ -31,9 +31,11 @@ def handle_json():
             return jsonify({"error": "El cuerpo de la solicitud no puede estar vacío"}), 400
 
         print(f"Received JSON data: {data}")
+
+        # Añadir la fuente
+        data['source'] = 'HTTP'
         
-        
-        # Insertar el documento en MongoDB (asumo una colección llamada 'coleccion')
+        # Insertar el documento en MongoDB
         result = collection.insert_one(data)
         
         # Retornar respuesta con el ID del documento insertado
