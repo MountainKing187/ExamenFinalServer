@@ -96,7 +96,7 @@ def get_latest_sensor_readings():
 def get_ia_analisis():
     collection = mongo.get_collection('sensor_readings')
     hora_actual = datetime.utcnow()
-    hace_un_minuto = utc_time_to_millis(hora_actual) - utc_time_to_millis(timedelta(minutes=1))
+    hace_un_minuto = utc_time_to_millis(hora_actual - timedelta(minutes=1))
     
     # Consultar registros recientes
     query = {"timestamp": {"$gte": hace_un_minuto}}
