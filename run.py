@@ -1,17 +1,19 @@
 from app import create_app
 from app.gemini_agent import GeminiAgent
+from app.tcp_server import TCPServer
+from app.udp_server import UDPServer
 import threading
 
 app = create_app()
 
 def main():
     # Iniciar servidores
-    tcp_server = TCPServer(port=6000)
-    udp_server = UDPServer(port=7000)
+    tcpServer = TCPServer(port=6000)
+    udpServer = UDPServer(port=7000)
     # gemini_agent = GeminiAgent()
 
-    tcp_server.start()
-    udp_server.start()
+    tcpServer.start()
+    udpServer.start()
     # gemini_agent.start()
 
     try:
