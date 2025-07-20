@@ -5,12 +5,9 @@ from bson import json_util
 import time
 from datetime import datetime, timedelta
 from pymongo import DESCENDING
-import logging
 
 main_bp = Blueprint('main', __name__)
 
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
 
 @main_bp.route('/')
 def dashboard():
@@ -33,7 +30,7 @@ def handle_json():
         if not data:
             return jsonify({"error": "El cuerpo de la solicitud no puede estar vacío"}), 400
 
-        logger.debug(f"Received JSON data: {data}")
+        print(f"Received JSON data: {data}")
         
         
         # Insertar el documento en MongoDB (asumo una colección llamada 'coleccion')
@@ -83,12 +80,12 @@ def get_latest_sensor_readings():
         }), 200
         
     except KeyError as e:
-        logger.error(f"Campo faltante en documento: {str(e)}")
+        print(f"Campo faltante en documento: {str(e)}")
         return jsonify({"error": f"Campo requerido faltante: {str(e)}"}), 500
     except ValueError:
         return jsonify({"error": "El parámetro 'n' debe ser un número entero válido"}), 400
     except Exception as e:
-        logger.error(f"Error al obtener lecturas: {str(e)}", exc_info=True)
+        print(f"Error al obtener lecturas: {str(e)}")
         return jsonify({"error": "Error interno del servidor"}), 500
 
 @main_bp.route('/api/veria', methods=['GET'])
