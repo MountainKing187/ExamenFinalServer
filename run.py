@@ -15,6 +15,7 @@ def main():
 
     tcpServer.start()
     udpServer.start()
+    app.run(host='0.0.0.0', port=8081, use_reloader=False, debug=True)
     # gemini_agent.start()
 
     try:
@@ -31,6 +32,5 @@ def main():
 
 if __name__ == '__main__':
     print("asasd")
-    app.run(host='0.0.0.0', port=8081, use_reloader=False, debug=True)
     main()
     print("yeehaw")
