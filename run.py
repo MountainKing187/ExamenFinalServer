@@ -4,7 +4,7 @@ import threading
 
 app = create_app()
 
-def threads()
+def threads():
     gem_age = GeminiAgent()
 
     ai_thread = threading.Thread(
