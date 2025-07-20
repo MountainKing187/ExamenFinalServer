@@ -6,13 +6,13 @@ from datetime import datetime
 from app import mongo
 
 class TCPServer:
-    def __init__(self, host='0.0.0.0', port=5001):
+    def __init__(self, host='0.0.0.0', port=5001, collection_name='sensor_readings_tcp'):
         self.host = host
         self.port = port
         self.server_socket = None
         self.running = False
         
-        self.sensor_collection = mongo.get_collection('sensor_readings')
+        self.sensor_collection = mongo.get_collection(collection_name)
     
     def start(self):
         """Inicia el servidor TCP en un hilo separado"""
