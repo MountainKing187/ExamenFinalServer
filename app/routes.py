@@ -118,7 +118,7 @@ def perform_analysis(registros):
         # Si no hay datos nuevos, saltar el análisis
         if not registros:
             print("No hay nuevos datos para analizar")
-            return
+            return "No hay nuevos datos para analizar"
 
         prompt = f"""
         Analiza estos datos de un sensor acelerómetro y detecta posibles anomalías.
@@ -135,5 +135,4 @@ def perform_analysis(registros):
     except Exception as e:
         print(f"Error en el análisis: {e}")
         time.sleep(10)
-
-    return
+        return f"Error en el análisis: {e}"
