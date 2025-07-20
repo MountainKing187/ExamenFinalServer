@@ -105,7 +105,7 @@ def get_ia_analisis():
     hace_un_minuto_millis = int(hace_un_minuto.timestamp() * 1000)
     
     registros = collection.find({
-        "timestamp": {
+        "Timestamp": {
             "$gte": hace_un_minuto_millis,
             "$lte": ahora_millis
         }
