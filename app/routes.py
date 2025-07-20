@@ -93,15 +93,16 @@ def get_latest_sensor_readings():
 
 @main_bp.route('/api/veria', methods=['GET'])
 def get_ia_analisis():
+    collection = mongo.get_collection('sensor_readings')
     hora_actual = datetime.utcnow()
     hace_un_minuto = hora_actual - timedelta(minutes=1)
     
     # Consultar registros recientes
     query = {"timestamp": {"$gte": hace_un_minuto}}
-    registros = list(self.sensor_readings.find(query))
+    registros = list(collection.find(query))
 
     analisis = perform_analysis(registros)
-    
+
     return analisis
 
 def perform_analysis(registros):
