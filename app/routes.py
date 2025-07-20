@@ -97,7 +97,7 @@ def get_ia_analisis():
     collection = mongo.get_collection('sensor_readings')
 
     # Obtener el tiempo actual y el de hace 1 minuto
-    ahora = datetime.utcnow() - timedelta(hours=4)
+    ahora = datetime.utcnow()
     hace_un_minuto = ahora - timedelta(minutes=1)
     
     # Convertir a timestamp en milisegundos
@@ -110,8 +110,10 @@ def get_ia_analisis():
             "$lte": ahora_millis
         }
     }))
+    
+    resultado = [reg for reg in registros]
 
-    analisis = perform_analysis(registros)
+    analisis = perform_analysis(resultado)
 
     return analisis
 
