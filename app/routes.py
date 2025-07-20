@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template, jsonify, request, current_app
-from app import mongo
-from app.utils import config_loader
-import json
-from bson import json_util
-import time
 from datetime import datetime, timedelta
+import google.generativeai as genai
+from app.utils import config_loader
 from pymongo import DESCENDING
+from bson import json_util
+from app import mongo
+import json
+import time
 
 main_bp = Blueprint('main', __name__)
 
