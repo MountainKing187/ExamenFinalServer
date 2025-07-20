@@ -3,6 +3,7 @@ import time
 from app.utils import config_loader, mongo_handler
 import os
 import google.generativeai as genai
+import threading
 
 class GeminiAgent:
 
@@ -13,54 +14,84 @@ class GeminiAgent:
         if not self.config.GEMINI_API_KEY:
             raise ValueError("La API Key de Gemini no está configurada")
 
-        self.mongo = mongo_handler.MongoHandler()
-        self.mongo.client = self.mongo.create_client(self.config.MONGODB_URI)
-        self.mongo.db = self.mongo.client[self.config.MONGO_DB_NAME]
-
-        self.sensor_readings = self.mongo.db.sensor_readings
-        self.ia_analisis = self.mongo.db.ia_analisis
-
-    def analizar_datos_gemini(self):
-
-        # Configurar Gemini
-        genai.configure(api_key= self.config.GEMINI_API_KEY)
-        model = genai.GenerativeModel('gemini-2.5-flash')
-
-        hora_actual = datetime.utcnow()
-        hace_un_minuto= hora_actual - timedelta(minutes=1)
+        self.sensor_readings = mongo.get_collection('sensor_readings')
+        self.ia_analisis = mongo.get_collection('ia_analisis')
         
-        try:
-                        
-            # Consultar registros de hace dos horas
-            query = {
-                "timestamp": {"$gte": hace_un_minuto}
-            }
+        self.running = False
+        self.thread = None
 
-            registros = list(self.sensor_readings.find(query))
+    def start(self):
+        """Inicia el agente en un hilo separado"""
+        if self.running:
+            print("El agente ya está en ejecución")
+            return
+        
+        self.running = True
+        self.thread = threading.Thread(target=self._run_analysis_loop, daemon=True)
+        self.thread.start()
+        print("GeminiAgent iniciado")
 
-            prompt = f"""
-            Analiza estos datos de sensor y detecta posibles anomalias
+    def stop(self):
+        """Detiene el agente"""
+        self.running = False
+        if self.thread:
+            self.thread.join(timeout=5)  # Esperar a que termine el hilo
+        print("GeminiAgent detenido")
 
-            Datos de formato json
-            (Tiempo : Unix Timestamp in milliseconds , x = float,y = float, z = float)
-            {registros}
-            """
-          
-            response = model.generate_content(prompt)
-            analisis = response.text.strip()
+    def _run_analysis_loop(self):
+        """Bucle principal de análisis periódico"""
+        # Configurar Gemini una sola vez
+        genai.configure(api_key=self.config.GEMINI_API_KEY)
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        
+        while self.running:
+            try:
+                self._perform_analysis(model)
+            except Exception as e:
+                print(f"Error en el análisis: {e}")
+                self._safe_sleep(10)
             
-            # Crear documento para insertar
-            documento_analisis = {
-                "fecha_analisis": datetime.utcnow(),
-                "prompt_utilizado": prompt,
-                "analisis_gemini": analisis
-            }
-                
-            self.ia_analisis.insert_one(documento_analisis)
+            # Espera principal entre análisis
+            self._safe_sleep(120)
 
-        except Exception as e:
-            print(f"Error: {e}")
-            time.sleep(10)
+    def _perform_analysis(self, model):
+        """Realiza el análisis de datos con Gemini"""
+        hora_actual = datetime.utcnow()
+        hace_un_minuto = hora_actual - timedelta(minutes=1)
+        
+        # Consultar registros recientes
+        query = {"timestamp": {"$gte": hace_un_minuto}}
+        registros = list(self.sensor_readings.find(query))
 
-        time.sleep(120)
+        # Si no hay datos nuevos, saltar el análisis
+        if not registros:
+            print("No hay nuevos datos para analizar")
+            return
 
+        prompt = f"""
+        Analiza estos datos de un sensor acelerómetro y detecta posibles anomalías.
+
+        Datos en formato JSON (Tiempo: Unix Timestamp en milisegundos, x=float, y=float, z=float):
+        {registros}
+        """
+      
+        response = model.generate_content(prompt)
+        analisis = response.text.strip()
+        
+        # Crear documento para insertar
+        documento_analisis = {
+            "fecha_analisis": datetime.utcnow(),
+            "prompt_utilizado": prompt,
+            "analisis_gemini": analisis,
+            "datos_analizados": len(registros)
+        }
+            
+        self.ia_analisis.insert_one(documento_analisis)
+        print(f"Análisis insertado en la base de datos (registros: {len(registros)})")
+
+    def _safe_sleep(self, seconds):
+        """Espera con verificación periódica para permitir detención"""
+        for _ in range(seconds):
+            if not self.running:
+                break
+            time.sleep(1)
