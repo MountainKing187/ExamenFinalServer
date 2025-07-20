@@ -96,7 +96,7 @@ def get_latest_sensor_readings():
 def get_ia_analisis():
     collection = mongo.get_collection('sensor_readings')
     hora_actual = datetime.utcnow()
-    hace_un_minuto = hora_actual - timedelta(minutes=1)
+    hace_un_minuto = utc_time_to_millis(hora_actual) - utc_time_to_millis(timedelta(minutes=1))
     
     # Consultar registros recientes
     query = {"timestamp": {"$gte": hace_un_minuto}}
@@ -136,3 +136,12 @@ def perform_analysis(registros):
         print(f"Error en el análisis: {e}")
         time.sleep(10)
         return f"Error en el análisis: {e}"
+
+def utc_time_to_millis(utc_time):
+    # Calculate total seconds since epoch
+    epoch = datetime(1970, 1, 1)
+    total_seconds_since_epoch = (utc_time - epoch).total_seconds()
+
+    # Convert to milliseconds
+    milliseconds_since_epoch = int(total_seconds_since_epoch * 1000)
+    return milliseconds_since_epoch
