@@ -1,5 +1,5 @@
-// Umbral de alerta (ajustar según necesidades)
-const ALERT_THRESHOLD = 9.8;
+// Variable para el umbral de alerta (valor inicial 9.8)
+let alertThreshold = 9.8;
 
 // Configuración inicial del gráfico
 const ctx = document.getElementById('accelerationChart').getContext('2d');
@@ -51,8 +51,34 @@ const chart = new Chart(ctx, {
     }
 });
 
+// Configurar el control deslizante del umbral
+const thresholdSlider = document.getElementById('thresholdSlider');
+const thresholdValue = document.getElementById('thresholdValue');
+
+// Actualizar la visualización del valor del umbral
+thresholdSlider.addEventListener('input', function() {
+    alertThreshold = parseFloat(this.value);
+    thresholdValue.textContent = alertThreshold.toFixed(1);
+});
+
 // Conectar a WebSocket
 const socket = io();
+
+// Función para actualizar el estado de alerta
+function updateAlertStatus(magnitude) {
+    const statusElement = document.getElementById('accelerationStatus');
+    const accelerationCard = document.getElementById('accelerationCard');
+    
+    if (magnitude > alertThreshold) {
+        statusElement.textContent = 'ALERTA!';
+        statusElement.className = 'status alert';
+        accelerationCard.classList.add('alert-card');
+    } else {
+        statusElement.textContent = 'Normal';
+        statusElement.className = 'status normal';
+        accelerationCard.classList.remove('alert-card');
+    }
+}
 
 // Manejar datos en tiempo real
 socket.on('new_acceleration_data', (data) => {
@@ -64,21 +90,12 @@ socket.on('new_acceleration_data', (data) => {
     document.getElementById('accelerationValue').textContent = formattedMagnitude;
     
     // Actualizar valores de componentes
-    document.getElementById('xValue').textContent = data.x.toFixed(2)
+    document.getElementById('xValue').textContent = data.x.toFixed(2);
     document.getElementById('yValue').textContent = data.y.toFixed(2);
     document.getElementById('zValue').textContent = data.z.toFixed(2);
-
+    
     // Actualizar estado de alerta
-    const statusElement = document.getElementById('accelerationStatus');
-    if (magnitude > ALERT_THRESHOLD) {
-        statusElement.textContent = 'ALERTA!';
-        statusElement.className = 'status alert';
-        document.getElementById('accelerationCard').classList.add('alert-card');
-    } else {
-        statusElement.textContent = 'Normal';
-        statusElement.className = 'status normal';
-        document.getElementById('accelerationCard').classList.remove('alert-card');
-    }
+    updateAlertStatus(magnitude);
     
     // Actualizar gráfico
     const time = new Date(data.Timestamp).toLocaleTimeString();
@@ -118,3 +135,6 @@ document.getElementById('insightsBtn').addEventListener('click', async () => {
         insightsResult.textContent = 'Error al obtener insights';
     }
 });
+
+// Inicializar el valor del umbral
+thresholdValue.textContent = alertThreshold.toFixed(1);

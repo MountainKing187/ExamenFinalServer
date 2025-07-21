@@ -167,8 +167,9 @@ def perform_analysis(registros):
 
         prompt = f"""
         Analiza estos datos de un sensor acelerómetro y detecta posibles anomalías. Quiero que me entregue
-        un analisis corto pero contundente en texto puro y que cuando referencias un timestamp convierte el
-        timestamp al formato UTC. 
+        un analisis corto pero contundente en texto puro, sin asteriscos ya que se va a mostrar en una caja 
+        de texto sin formato especial y que cuando referencias un timestamp convierte el timestamp en un 
+        formato legible para las personas. 
 
         Datos en formato JSON (Timestamp: Unix Timestamp en milisegundos, x=float, y=float, z=float):
         {registros}

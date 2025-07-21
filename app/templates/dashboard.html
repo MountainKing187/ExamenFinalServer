@@ -18,7 +18,8 @@
                 <h2>Aceleración Actual</h2>
                 <div class="value-display" id="accelerationValue">0.00</div>
                 <div class="status" id="accelerationStatus">Normal</div>
-                        <!-- Componentes individuales -->
+                
+                <!-- Componentes individuales -->
                 <div class="components-container">
                     <div class="component">
                         <span class="component-label">X:</span>
@@ -31,6 +32,15 @@
                     <div class="component">
                         <span class="component-label">Z:</span>
                         <span class="component-value" id="zValue">0.00</span>
+                    </div>
+                </div>
+                
+                <!-- Control de umbral -->
+                <div class="threshold-control">
+                    <label for="thresholdSlider">Umbral de alerta:</label>
+                    <div class="slider-container">
+                        <input type="range" id="thresholdSlider" min="0" max="20" step="0.1" value="9.8">
+                        <span id="thresholdValue">9.8</span>
                     </div>
                 </div>
             </div>

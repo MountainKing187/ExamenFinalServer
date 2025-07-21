@@ -31,6 +31,8 @@ h1 {
     padding: 20px;
     text-align: center;
     min-width: 250px;
+    width: 100%;
+    max-width: 500px;
 }
 
 .value-display {
@@ -43,6 +45,84 @@ h1 {
     font-size: 1.2rem;
     padding: 5px;
     border-radius: 5px;
+    margin: 10px 0;
+}
+
+/* Componentes de aceleración */
+.components-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 15px 0;
+    padding: 10px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.component {
+    text-align: center;
+    padding: 0 10px;
+}
+
+.component-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+.component-value {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Control de umbral */
+.threshold-control {
+    margin-top: 15px;
+    padding-top: 15px;
+    text-align: left;
+}
+
+.threshold-control label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#thresholdSlider {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: #ddd;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+#thresholdSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3498db;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#thresholdSlider::-webkit-slider-thumb:hover {
+    background: #2980b9;
+}
+
+#thresholdValue {
+    min-width: 40px;
+    text-align: right;
+    font-weight: bold;
+    font-size: 1.1rem;
 }
 
 /* Gráfico */
@@ -97,6 +177,11 @@ h1 {
     animation: pulse 1.5s infinite;
 }
 
+.alert-card {
+    box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
+    transition: box-shadow 0.5s;
+}
+
 @keyframes pulse {
     0% { opacity: 1; }
     50% { opacity: 0.7; }
@@ -112,35 +197,7 @@ h1 {
     .value-display {
         font-size: 2.5rem;
     }
-}
-/* Componentes de aceleración */
-.components-container {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
-}
-
-.component {
-    text-align: center;
-    padding: 0 10px;
-}
-
-.component-label {
-    display: block;
-    font-size: 0.9rem;
-    color: #7f8c8d;
-}
-
-.component-value {
-    display: block;
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-
-/* Responsive para componentes */
-@media (max-width: 480px) {
+    
     .components-container {
         flex-direction: column;
         gap: 10px;
@@ -150,5 +207,15 @@ h1 {
         display: flex;
         justify-content: space-between;
         padding: 5px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .value-card {
+        padding: 15px;
+    }
+    
+    .value-display {
+        font-size: 2.2rem;
     }
 }
