@@ -1,7 +1,9 @@
 from flask import Flask
+from flask_socketio import SocketIO
 from .utils.mongo_handler import MongoHandler
 from .utils.config_loader import load_config
 
+socketio = SocketIO()
 mongo = MongoHandler()
 
 def create_app():
@@ -12,6 +14,7 @@ def create_app():
     
     # Inicializar extensiones
     mongo.init_app(app)
+    socketio.init_app(app)
     
     # Registrar blueprints
     from .routes import main_bp

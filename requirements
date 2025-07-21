@@ -1,4 +1,5 @@
 flask
+flask-socketio
 pymongo
 python-dotenv
 google-generativeai
