@@ -147,6 +147,8 @@ def get_insights():
 
     resultado = [reg for reg in registros]
 
+    for
+
     analisis = perform_analysis(resultado)
     
     return jsonify({"insight": analisis})
@@ -167,9 +169,10 @@ def perform_analysis(registros):
 
         prompt = f"""
         Analiza estos datos de un sensor acelerómetro y detecta posibles anomalías. Quiero que me entregue
-        un analisis corto pero contundente en texto puro.
+        un analisis corto pero contundente en texto puro y que cuando referencias un timestamp convierte el
+        timestamp al formato UTC. 
 
-        Datos en formato JSON (Tiempo: Unix Timestamp en milisegundos, x=float, y=float, z=float):
+        Datos en formato JSON (Timestamp: Unix Timestamp en milisegundos, x=float, y=float, z=float):
         {registros}
         """
       
@@ -191,3 +194,10 @@ def utc_time_to_millis(utc_time):
     # Convert to milliseconds
     milliseconds_since_epoch = int(total_seconds_since_epoch * 1000)
     return milliseconds_since_epoch
+
+def millis_to_timedate(milliseconds):
+    # Convert milliseconds to seconds (as a float to retain precision for microseconds)
+    seconds = milliseconds / 1000
+
+    # Convert the seconds timestamp to a datetime object
+    return datetime.fromtimestamp(seconds)
