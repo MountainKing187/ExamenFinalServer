@@ -14,16 +14,18 @@ class TCPServer:
         
         self.sensor_collection = mongo.get_collection(collection_name)
     
-    def start(self):
-        """Inicia el servidor TCP en un hilo separado"""
+def start(self):
+    try:
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen(5)
         self.running = True
-        
         print(f"TCP Server escuchando en {self.host}:{self.port}")
         server_thread = threading.Thread(target=self._run_server, daemon=True)
         server_thread.start()
+    except Exception as e:
+        print(f"ERROR al iniciar servidor: {e}")  # ¡Agregar esto!
+        self.running = False
     
     def stop(self):
         """Detiene el servidor TCP"""
@@ -48,6 +50,7 @@ class TCPServer:
         with conn:
             print(f"Conexión TCP establecida desde {addr}")
             buffer = b''
+            conn.settimeout(2.0)
             
             while self.running:
                 try:
