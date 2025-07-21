@@ -47,23 +47,23 @@ class TCPServer:
                 self.server_socket.close()
                 print("Socket TCP cerrado correctamente")
     
-def _run_server(self):
-    print("Iniciando bucle principal del servidor...")
-    while self.running:
-        try:
-            conn, addr = self.server_socket.accept()
-            print(f"Nueva conexión aceptada de {addr}")
-            client_thread = threading.Thread(
-                target=self._handle_client, 
-                args=(conn, addr),
-                daemon=True
-            )
-            client_thread.start()
-            print(f"Conexiones activas: {threading.active_count() - 1}")
-        except OSError as e:
-            if self.running:
-                print(f"Error en accept(): {str(e)}")
-            break
+    def _run_server(self):
+        print("Iniciando bucle principal del servidor...")
+        while self.running:
+            try:
+                conn, addr = self.server_socket.accept()
+                print(f"Nueva conexión aceptada de {addr}")
+                client_thread = threading.Thread(
+                    target=self._handle_client, 
+                    args=(conn, addr),
+                    daemon=True
+                )
+                client_thread.start()
+                print(f"Conexiones activas: {threading.active_count() - 1}")
+            except OSError as e:
+                if self.running:
+                    print(f"Error en accept(): {str(e)}")
+                break
 
     def _handle_client(self, conn, addr):
         with conn:
