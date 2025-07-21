@@ -1,47 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Crypto Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Aceleraciones</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head> 
-<body> 
-    <div class="container"> 
-        <h1>Crypto Dashboard</h1> 
-         
-        <!-- Selector de moneda --> 
-        <div class="currency-selector"> 
-            <button class="currency-btn active" data-currency="ethereum">Ethereum</button> 
-            <button class="currency-btn" data-currency="dogecoin">Dogecoin</button> 
-            <button class="currency-btn" data-currency="bitcoin">Bitcoin</button> 
-        </div> 
-        <!-- Selector de hora --> 
-        <div class="time-range-selector"> 
-                <button class="time-btn active" data-hours="24">24h</button> 
-                <button class="time-btn" data-hours="12">12h</button> 
-                <button class="time-btn" data-hours="6">6h</button> 
-        </div> 
-        <!-- Contenedor del gráfico --> 
-        <div class="chart-container"> 
-            <canvas id="cryptoChart"></canvas> 
-        </div> 
-         
-        <!-- Sección de bloques y transacciones --> 
-        <div class="grid-container"> 
-            <div class="recent-blocks"> 
-                <h2>Últimos Bloques</h2> 
-                <ul id="blocks-list"></ul> 
-            </div> 
-             
-            <div class="block-transactions"> 
-                <h2>Transacciones del Bloque</h2> 
-                <div id="transactions-container"></div> 
-            </div> 
-        </div> 
-         
-    </div> 
-     
-    <script src="{{ url_for('static', filename='js/charts.js') }}"></script> 
-</body> 
+</head>
+<body>
+    <div class="container">
+        <h1>Monitor de Aceleraciones en Tiempo Real</h1>
+        
+        <!-- Sección de valores en tiempo real -->
+        <div class="realtime-section">
+            <div class="value-card" id="accelerationCard">
+                <h2>Aceleración Actual</h2>
+                <div class="value-display" id="accelerationValue">0.00</div>
+                <div class="status" id="accelerationStatus">Normal</div>
+            </div>
+        </div>
+        
+        <!-- Gráfico de aceleraciones -->
+        <div class="chart-container">
+            <canvas id="accelerationChart"></canvas>
+        </div>
+        
+        <!-- Sección de Insights -->
+        <div class="insights-section">
+            <button id="insightsBtn">Solicitar Insights</button>
+            <div class="insights-result" id="insightsResult">
+                Los insights aparecerán aquí...
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
 </html>

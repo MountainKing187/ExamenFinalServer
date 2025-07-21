@@ -117,6 +117,31 @@ def get_ia_analisis():
 
     return analisis
 
+@main_bp.route('/api/insights')
+def get_insights():
+    collection = mongo.get_collection('sensor_readings')
+
+    # Obtener el tiempo actual y el de hace 1 minuto
+    ahora = datetime.utcnow()
+    hace_un_minuto = ahora - timedelta(minutes=1)
+    
+    # Convertir a timestamp en milisegundos
+    ahora_millis = int(ahora.timestamp() * 1000)
+    hace_un_minuto_millis = int(hace_un_minuto.timestamp() * 1000)
+    
+    registros = collection.find({
+        "Timestamp": {
+            "$gte": hace_un_minuto_millis,
+            "$lte": ahora_millis
+        }
+    })
+
+    resultado = [reg for reg in registros]
+
+    analisis = perform_analysis(resultado)
+    
+    return jsonify({"insight": analisis})
+
 def perform_analysis(registros):
     config = config_loader.load_config()
 
