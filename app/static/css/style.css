@@ -113,3 +113,42 @@ h1 {
         font-size: 2.5rem;
     }
 }
+/* Componentes de aceleración */
+.components-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.component {
+    text-align: center;
+    padding: 0 10px;
+}
+
+.component-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+.component-value {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Responsive para componentes */
+@media (max-width: 480px) {
+    .components-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .component {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+    }
+}

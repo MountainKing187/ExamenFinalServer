@@ -4,6 +4,7 @@ import google.generativeai as genai
 from app.utils import config_loader
 from pymongo import DESCENDING
 from bson import json_util
+from app import socketio
 from app import mongo
 import json
 import time
@@ -39,6 +40,14 @@ def handle_json():
         # Insertar el documento en MongoDB
         result = collection.insert_one(data)
         print(str(result.inserted_id))
+
+        # Emitir los datos a través de WebSocket
+        socketio.emit('new_acceleration_data', {
+            'Timestamp': data['Timestamp'],
+            'x': data['x'],
+            'y': data['y'],
+            'z': data['z']
+        })
         
         # Retornar respuesta con el ID del documento insertado
         return jsonify({
