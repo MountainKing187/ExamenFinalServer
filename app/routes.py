@@ -166,7 +166,8 @@ def perform_analysis(registros):
             return "No hay nuevos datos para analizar"
 
         prompt = f"""
-        Analiza estos datos de un sensor acelerómetro y detecta posibles anomalías.
+        Analiza estos datos de un sensor acelerómetro y detecta posibles anomalías. Quiero que me entregue
+        un analisis corto pero contundente en texto puro.
 
         Datos en formato JSON (Tiempo: Unix Timestamp en milisegundos, x=float, y=float, z=float):
         {registros}
