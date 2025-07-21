@@ -87,22 +87,22 @@ def _run_server(self):
                     buffer += data
                     
                     # Procesar cuando recibamos un fin de línea
-                        if buffer.endswith(b'\n'):
-                            message = buffer.decode('utf-8').strip()
-                            buffer = b''
+                    if buffer.endswith(b'\n'):
+                        message = buffer.decode('utf-8').strip()
+                        buffer = b''
+                        
+                        try:
+                            parsed = self._parse_message(message)
+                            print(f"Datos recibidos de {addr}: {parsed}")
                             
-                            try:
-                                parsed = self._parse_message(message)
-                                print(f"Datos recibidos de {addr}: {parsed}")
-                                
-                                # Guardar en MongoDB
-                                if self._save_to_database(parsed):
-                                    conn.sendall(b"ACK: Datos recibidos y guardados\n")
-                                else:
-                                    conn.sendall(b"ACK: Datos recibidos pero error en DB\n")
-                            except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as e:
-                                error_msg = f"ERROR: {str(e)}\n"
-                                conn.sendall(error_msg.encode('utf-8'))
+                            # Guardar en MongoDB
+                            if self._save_to_database(parsed):
+                                conn.sendall(b"ACK: Datos recibidos y guardados\n")
+                            else:
+                                conn.sendall(b"ACK: Datos recibidos pero error en DB\n")
+                        except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as e:
+                            error_msg = f"ERROR: {str(e)}\n"
+                            conn.sendall(error_msg.encode('utf-8'))
 
                 
                 except socket.timeout:
