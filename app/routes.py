@@ -147,8 +147,6 @@ def get_insights():
 
     resultado = [reg for reg in registros]
 
-    for
-
     analisis = perform_analysis(resultado)
     
     return jsonify({"insight": analisis})
