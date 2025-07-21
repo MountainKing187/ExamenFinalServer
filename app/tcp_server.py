@@ -63,13 +63,13 @@ class TCPServer:
                         
                         try:
                             parsed = self._parse_message(message)
-                            print("Datos parseados:", parsed)
+                            print("Datos TCP parseados:", parsed)
                             
                             # Guardar en MongoDB
                             self._save_to_database(parsed)
                             
                             # Enviar ACK
-                            conn.sendall(b"ACK: Datos recibidos y guardados\n")
+                            conn.sendall(b"ACK: Datos TCP recibidos y guardados\n")
                         except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as e:
                             error_msg = f"ERROR: {str(e)}\n"
                             conn.sendall(error_msg.encode('utf-8'))
@@ -102,7 +102,7 @@ class TCPServer:
             
             return data
         except (TypeError, ValueError) as e:
-            raise ValueError(f"Error en conversión de tipos: {str(e)}")
+            raise ValueError(f"Error en conversión de datos TCP de tipos: {str(e)}")
     
     def _save_to_database(self, data):
         """Guarda los datos en MongoDB"""
@@ -122,8 +122,8 @@ class TCPServer:
             
             # Insertar en la colección
             result = self.sensor_collection.insert_one(document)
-            print(f"Datos guardados en MongoDB con ID: {result.inserted_id}")
+            print(f"Datos TCP guardados en MongoDB con ID: {result.inserted_id}")
             return True
         except Exception as e:
-            print(f"Error al guardar en MongoDB: {e}")
+            print(f"Error al guardar datos TCP en MongoDB: {e}")
             return False

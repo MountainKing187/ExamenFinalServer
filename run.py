@@ -9,7 +9,7 @@ app = create_app()
 
 def main():
     # Iniciar servidores
-    tcpServer = TCPServer(port=6000)
+    tcpServer = TCPServer(port=5001)
     udpServer = UDPServer(port=7000)
     # gemini_agent = GeminiAgent()
 
