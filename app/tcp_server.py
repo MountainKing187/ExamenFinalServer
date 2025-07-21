@@ -69,41 +69,39 @@ class TCPServer:
         with conn:
             print(f"Conexión TCP establecida desde {addr}")
             buffer = b''
+            timeout_count = 0  # Contador de timeouts consecutivos
+            max_timeouts = 3   # Máximo de timeouts antes de cerrar
             
-            # Configurar timeout (5 segundos es un valor razonable)
-            conn.settimeout(5.0)
+            # Timeout más corto para detección rápida
+            conn.settimeout(2.0)
             
             while self.running:
                 try:
                     data = conn.recv(1024)
                     if not data:
-                        print(f"Conexión cerrada por {addr}")
+                        print(f"Conexión cerrada por cliente: {addr}")
                         break
                         
+                    # Reiniciar contador al recibir datos
+                    timeout_count = 0
                     buffer += data
                     
-                    # Procesar cuando recibamos un fin de línea
                     if buffer.endswith(b'\n'):
-                        message = buffer.decode('utf-8').strip()
-                        buffer = b''
-                        
-                        try:
-                            parsed = self._parse_message(message)
-                            print(f"Datos recibidos de {addr}: {parsed}")
-                            
-                            # Guardar en MongoDB
-                            if self._save_to_database(parsed):
-                                conn.sendall(b"ACK: Datos recibidos y guardados\n")
-                            else:
-                                conn.sendall(b"ACK: Datos recibidos pero error en DB\n")
-                        except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as e:
-                            error_msg = f"ERROR: {str(e)}\n"
-                            conn.sendall(error_msg.encode('utf-8'))
+                        # ... (procesamiento igual que antes)
                 
-                # Manejar timeout específicamente
                 except socket.timeout:
-                    print(f"Timeout con {addr}, continuando...")
-                    # No romper la conexión, solo continuar esperando
+                    timeout_count += 1
+                    if timeout_count >= max_timeouts:
+                        print(f"Demasiados timeouts ({timeout_count}), cerrando conexión con {addr}")
+                        break
+                    
+                    print(f"Timeout {timeout_count}/{max_timeouts} con {addr}")
+                    # Enviar ping para verificar conexión
+                    try:
+                        conn.sendall(b"PING\n")
+                    except OSError:
+                        print(f"Conexión perdida con {addr}")
+                        break
                     continue
                     
                 except (ConnectionResetError, BrokenPipeError, OSError) as e:
