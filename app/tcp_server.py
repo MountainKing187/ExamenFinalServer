@@ -17,6 +17,14 @@ class TCPServer:
     def start(self):
         try:
             self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            
+            # Habilitar keep-alive
+            self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+            self.server_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 60)
+            self.server_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)
+            self.server_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 3)
+            
             self.server_socket.bind((self.host, self.port))
             self.server_socket.listen(5)
             self.running = True
@@ -24,39 +32,54 @@ class TCPServer:
             server_thread = threading.Thread(target=self._run_server, daemon=True)
             server_thread.start()
         except Exception as e:
-            print(f"ERROR al iniciar servidor: {e}")  # ¡Agregar esto!
+            print(f"ERROR al iniciar servidor: {e}")
             self.running = False
     
     def stop(self):
-        """Detiene el servidor TCP"""
         self.running = False
         if self.server_socket:
-            self.server_socket.close()
+            try:
+                # Cierra conexiones activas
+                self.server_socket.shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass  # Ignora errores si el socket ya estaba cerrado
+            finally:
+                self.server_socket.close()
+                print("Socket TCP cerrado correctamente")
     
     def _run_server(self):
+        print("Iniciando bucle principal del servidor...")
         while self.running:
             try:
                 conn, addr = self.server_socket.accept()
+                print(f"Nueva conexión aceptada de {addr}")
                 client_thread = threading.Thread(
                     target=self._handle_client, 
                     args=(conn, addr),
                     daemon=True
                 )
                 client_thread.start()
-            except OSError:
-                break  # Socket cerrado durante accept()
+                print(f"Conexiones activas: {threading.active_count() - 1}")
+            except OSError as e:
+                if self.running:
+                    print(f"Error en accept(): {str(e)}")
+                break
     
     def _handle_client(self, conn, addr):
         with conn:
             print(f"Conexión TCP establecida desde {addr}")
             buffer = b''
-            conn.settimeout(2.0)
+            
+            # Configurar timeout (5 segundos es un valor razonable)
+            conn.settimeout(5.0)
             
             while self.running:
                 try:
                     data = conn.recv(1024)
                     if not data:
+                        print(f"Conexión cerrada por {addr}")
                         break
+                        
                     buffer += data
                     
                     # Procesar cuando recibamos un fin de línea
@@ -66,17 +89,25 @@ class TCPServer:
                         
                         try:
                             parsed = self._parse_message(message)
-                            print("Datos TCP parseados:", parsed)
+                            print(f"Datos recibidos de {addr}: {parsed}")
                             
                             # Guardar en MongoDB
-                            self._save_to_database(parsed)
-                            
-                            # Enviar ACK
-                            conn.sendall(b"ACK: Datos TCP recibidos y guardados\n")
+                            if self._save_to_database(parsed):
+                                conn.sendall(b"ACK: Datos recibidos y guardados\n")
+                            else:
+                                conn.sendall(b"ACK: Datos recibidos pero error en DB\n")
                         except (UnicodeDecodeError, json.JSONDecodeError, ValueError) as e:
                             error_msg = f"ERROR: {str(e)}\n"
                             conn.sendall(error_msg.encode('utf-8'))
-                except (ConnectionResetError, BrokenPipeError):
+                
+                # Manejar timeout específicamente
+                except socket.timeout:
+                    print(f"Timeout con {addr}, continuando...")
+                    # No romper la conexión, solo continuar esperando
+                    continue
+                    
+                except (ConnectionResetError, BrokenPipeError, OSError) as e:
+                    print(f"Error de conexión con {addr}: {str(e)}")
                     break
     
     def _parse_message(self, message):
